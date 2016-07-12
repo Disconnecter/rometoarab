@@ -39,79 +39,41 @@ typedef enum : NSUInteger {
     {
         char rChar = [rome characterAtIndex:i];
 
+        NSArray* romeDigits = @[@(M), @(D), @(C), @(L), @(X), @(V), @(I)];
+        NSArray* arabValues = @[@(MVal), @(DVal), @(CVal), @(LVal), @(XVal), @(VVal), @(IVal)];
+
         switch (rChar)
         {
             case M:
-            {
-                arab += MVal;
-                break;
-            }
-
             case D:
+            case L:
+            case V:
             {
-                arab += DVal;
+                NSUInteger index = [romeDigits indexOfObject:@(rChar)];
+                arab += [[arabValues objectAtIndex:index] integerValue];
                 break;
             }
 
             case C:
-            {
-                NSInteger nextIndex = i + 1;
-                if (nextIndex < rome.length)
-                {
-                    char nextChar = [rome characterAtIndex:nextIndex];
-                    arab += (nextChar == D || nextChar == M) ? -CVal:CVal;
-                }
-                else
-                {
-                    arab += CVal;
-                }
-                break;
-            }
-
-            case L:
-            {
-                arab += LVal;
-                break;
-            }
-
+            case I:
             case X:
             {
+                NSUInteger index = [romeDigits indexOfObject:@(rChar)];
                 NSInteger nextIndex = i + 1;
+                NSUInteger value = [[arabValues objectAtIndex:index] integerValue];
                 if (nextIndex < rome.length)
                 {
                     char nextChar = [rome characterAtIndex:nextIndex];
-                    arab += (nextChar == L || nextChar == C) ? -XVal:XVal;
+                    arab += (nextChar == [[romeDigits objectAtIndex:index - 1] integerValue]
+                             || nextChar == [[romeDigits objectAtIndex:index - 2] integerValue])? -value:value;
                 }
                 else
                 {
-                    arab += XVal;
+                    arab += value;
                 }
-
                 break;
             }
 
-            case V:
-            {
-                arab += VVal;
-                break;
-            }
-
-            case I:
-            {
-                NSInteger nextIndex = i + 1;
-                if (nextIndex < rome.length)
-                {
-                    char nextChar = [rome characterAtIndex:nextIndex];
-                    arab += (nextChar == V || nextChar == X) ? -IVal:IVal;
-                }
-                else
-                {
-                    arab += IVal;
-                }
-
-                break;
-            }
-                
             default:
                 return -1;
                 break;
@@ -119,6 +81,15 @@ typedef enum : NSUInteger {
     }
     
     return arab;
+}
+
+- (NSUInteger)value:(NSInteger)digit forChar:(char)symbole exclude:(NSArray*)arr
+{
+    if ([arr containsObject:@(symbole)])
+    {
+        return -digit;
+    }
+    return digit;
 }
 
 
