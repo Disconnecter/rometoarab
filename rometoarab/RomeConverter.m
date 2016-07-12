@@ -34,49 +34,29 @@ typedef enum : NSUInteger {
 - (NSInteger) rometoarab:(NSString*)rome
 {
     NSInteger arab = 0;
+    NSArray* romeDigits = @[@(M), @(D), @(C), @(L), @(X), @(V), @(I)];
+    NSArray* romeSpecialDigits = @[@(C), @(X), @(I)];
+    NSArray* arabValues = @[@(MVal), @(DVal), @(CVal), @(LVal), @(XVal), @(VVal), @(IVal)];
 
     for (int i = 0; i < rome.length; ++i)
     {
         char rChar = [rome characterAtIndex:i];
 
-        NSArray* romeDigits = @[@(M), @(D), @(C), @(L), @(X), @(V), @(I)];
-        NSArray* arabValues = @[@(MVal), @(DVal), @(CVal), @(LVal), @(XVal), @(VVal), @(IVal)];
-
-        switch (rChar)
+        if (![romeDigits containsObject:@(rChar)])
         {
-            case M:
-            case D:
-            case L:
-            case V:
-            {
-                NSUInteger index = [romeDigits indexOfObject:@(rChar)];
-                arab += [[arabValues objectAtIndex:index] integerValue];
-                break;
-            }
+            return -1;
+        }
 
-            case C:
-            case I:
-            case X:
-            {
-                NSUInteger index = [romeDigits indexOfObject:@(rChar)];
-                NSInteger nextIndex = i + 1;
-                NSUInteger value = [[arabValues objectAtIndex:index] integerValue];
-                if (nextIndex < rome.length)
-                {
-                    char nextChar = [rome characterAtIndex:nextIndex];
-                    arab += (nextChar == [[romeDigits objectAtIndex:index - 1] integerValue]
-                             || nextChar == [[romeDigits objectAtIndex:index - 2] integerValue])? -value:value;
-                }
-                else
-                {
-                    arab += value;
-                }
-                break;
-            }
+        NSUInteger index = [romeDigits indexOfObject:@(rChar)];
+        NSUInteger value = [[arabValues objectAtIndex:index] integerValue];
+        NSInteger nextIndex = i + 1;
+        arab += value;
+        if ([romeSpecialDigits containsObject:@(rChar)] && nextIndex < rome.length)
+        {
+            char nextChar = [rome characterAtIndex:nextIndex];
+            arab += (nextChar == [[romeDigits objectAtIndex:index - 1] integerValue]
+                     || nextChar == [[romeDigits objectAtIndex:index - 2] integerValue])? -2*value:0;
 
-            default:
-                return -1;
-                break;
         }
     }
     
