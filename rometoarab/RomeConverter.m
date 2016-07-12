@@ -83,14 +83,4 @@ typedef enum : NSUInteger {
     return arab;
 }
 
-- (NSUInteger)value:(NSInteger)digit forChar:(char)symbole exclude:(NSArray*)arr
-{
-    if ([arr containsObject:@(symbole)])
-    {
-        return -digit;
-    }
-    return digit;
-}
-
-
 @end
