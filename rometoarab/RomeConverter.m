@@ -8,56 +8,48 @@
 
 #import "RomeConverter.h"
 
-typedef enum : NSUInteger {
-    M = 'M',
-    D = 'D',
-    C = 'C',
-    L = 'L',
-    X = 'X',
-    V = 'V',
-    I = 'I'
-} RomeDigit;
-
-typedef enum : NSUInteger {
-    MVal = 1000,
-    DVal = 500,
-    CVal = 100,
-    LVal = 50,
-    XVal = 10,
-    VVal = 5,
-    IVal = 1
-} RomeDigitValues;
-
 @implementation RomeConverter
 
 
 - (NSInteger) rometoarab:(NSString*)rome
 {
     NSInteger arab = 0;
-    NSArray* romeDigits = @[@(M), @(D), @(C), @(L), @(X), @(V), @(I)];
-    NSArray* romeSpecialDigits = @[@(C), @(X), @(I)];
-    NSArray* arabValues = @[@(MVal), @(DVal), @(CVal), @(LVal), @(XVal), @(VVal), @(IVal)];
 
-    for (int i = 0; i < rome.length; ++i)
+    NSDictionary* dict = @{@('M'):@(1000),
+                           @('D'):@(500),
+                           @('C'):@(100),
+                           @('L'):@(50),
+                           @('X'):@(10),
+                           @('V'):@(5),
+                           @('I'):@(1)};
+    int prev = 0;
+    int countRep = 0;
+
+    for (int i = (int)rome.length - 1; i >= 0; --i)
     {
-        char rChar = [rome characterAtIndex:i];
+        int val = [[dict objectForKey:@([rome characterAtIndex:i])] intValue];
 
-        if (![romeDigits containsObject:@(rChar)])
+        if (val == 0)
         {
             return -1;
         }
 
-        NSUInteger index = [romeDigits indexOfObject:@(rChar)];
-        NSUInteger value = [[arabValues objectAtIndex:index] integerValue];
-        NSInteger nextIndex = i + 1;
-        arab += value;
-        if ([romeSpecialDigits containsObject:@(rChar)] && nextIndex < rome.length)
+        arab += prev > val? -val:val;
+        if (prev == val)
         {
-            char nextChar = [rome characterAtIndex:nextIndex];
-            arab += (nextChar == [[romeDigits objectAtIndex:index - 1] integerValue]
-                     || nextChar == [[romeDigits objectAtIndex:index - 2] integerValue])? -2*value:0;
-
+            countRep++;
         }
+        else
+        {
+            countRep = 0;
+        }
+
+        if (countRep > 3)
+        {
+            return -1;
+        }
+
+        prev = val;
     }
     
     return arab;
